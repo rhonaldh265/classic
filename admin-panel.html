@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Classic Collection</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            opacity: 0.8;
+        }
+        
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .business-summary {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .summary-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 10px;
+            min-width: 200px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            flex: 1;
+        }
+        
+        .summary-card h3 {
+            color: #7f8c8d;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .summary-card .value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .summary-card .value.positive {
+            color: #27ae60;
+        }
+        
+        .summary-card .value.negative {
+            color: #e74c3c;
+        }
+        
+        .content {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 20px;
+        }
+        
+        .sidebar {
+            flex: 1;
+            min-width: 250px;
+            background: #34495e;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-right: 20px;
+        }
+        
+        .main-content {
+            flex: 2;
+            min-width: 300px;
+        }
+        
+        .section-title {
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title i {
+            margin-right: 10px;
+        }
+        
+        .inventory-list {
+            margin-bottom: 30px;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 10px;
+        }
+        
+        .inventory-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            transition: background 0.3s;
+        }
+        
+        .inventory-item:hover {
+            background: #f9f9f9;
+        }
+        
+        .item-info {
+            flex: 1;
+        }
+        
+        .item-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+        
+        .item-details {
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        
+        .item-image {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-right: 15px;
+        }
+        
+        .item-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .edit-btn {
+            background: #3498db;
+            color: white;
+        }
+        
+        .edit-btn:hover {
+            background: #2980b9;
+        }
+        
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .delete-btn:hover {
+            background: #c0392b;
+        }
+        
+        .add-item-form {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        .submit-btn {
+            background: #2ecc71;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+        
+        .submit-btn:hover {
+            background: #27ae60;
+        }
+        
+        .auth-container {
+            width: 100%;
+            max-width: 400px;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+        
+        .auth-container h2 {
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        
+        .password-input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        .login-btn {
+            background: #2c3e50;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+        
+        .login-btn:hover {
+            background: #1a252f;
+        }
+        
+        .error-message {
+            color: #e74c3c;
+            margin-top: 10px;
+            display: none;
+        }
+        
+        .stats {
+            margin-bottom: 30px;
+        }
+        
+        .stats h2 {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                min-width: 100%;
+                margin-right: 0;
+                margin-bottom: 20px;
+            }
+            
+            .business-summary {
+                flex-direction: column;
+            }
+            
+            .summary-card {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="authScreen" class="auth-container">
+        <h2><i class="fas fa-lock"></i> Admin Login</h2>
+        <p>Enter password to access the admin panel</p>
+        <input type="password" id="passwordInput" class="password-input" placeholder="Enter password">
+        <button onclick="checkPassword()" class="login-btn">Login</button>
+        <p id="errorMsg" class="error-message">Incorrect password. Please try again.</p>
+    </div>
+
+    <div id="adminPanel" class="container" style="display: none;">
+        <div class="header">
+            <h1><i class="fas fa-crown"></i> Classic Collection Admin</h1>
+            <p>Inventory Management & Business Analytics</p>
+            <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+        
+        <div class="business-summary">
+            <div class="summary-card">
+                <h3><i class="fas fa-boxes"></i> Total Products</h3>
+                <div class="value" id="totalProducts">4</div>
+            </div>
+            <div class="summary-card">
+                <h3><i class="fas fa-shopping-basket"></i> Total Inventory Value</h3>
+                <div class="value" id="totalInventoryValue">KES 16,700</div>
+            </div>
+            <div class="summary-card">
+                <h3><i class="fas fa-money-bill-wave"></i> Circulating Amount</h3>
+                <div class="value" id="circulatingAmount">KES 12,450</div>
+            </div>
+            <div class="summary-card">
+                <h3><i class="fas fa-chart-line"></i> Avg. Product Price</h3>
+                <div class="value" id="avgProductPrice">KES 4,175</div>
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="main-content">
+                <h2 class="section-title"><i class="fas fa-boxes"></i> Inventory Management</h2>
+                
+                <div class="inventory-list" id="inventoryList">
+                    <!-- Inventory items will be loaded here -->
+                </div>
+                
+                <h2 class="section-title"><i class="fas fa-plus-circle"></i> Add New Item</h2>
+                
+                <div class="add-item-form">
+                    <div class="form-group">
+                        <label for="itemName">Product Name</label>
+                        <input type="text" id="itemName" placeholder="Enter product name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="itemMaterial">Material</label>
+                        <input type="text" id="itemMaterial" placeholder="Enter material">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="itemSize">Size</label>
+                        <select id="itemSize">
+                            <option value="S">Small (S)</option>
+                            <option value="M">Medium (M)</option>
+                            <option value="L">Large (L)</option>
+                            <option value="XL">Extra Large (XL)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="itemPrice">Price (KES)</label>
+                        <input type="number" id="itemPrice" placeholder="Enter price">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="itemStock">Initial Stock</label>
+                        <input type="number" id="itemStock" placeholder="Enter initial stock quantity">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="itemImage">Image URL</label>
+                        <input type="text" id="itemImage" placeholder="Enter image URL">
+                    </div>
+                    
+                    <button class="submit-btn" onclick="addNewItem()"><i class="fas fa-plus"></i> Add Product</button>
+                </div>
+            </div>
+            
+            <div class="sidebar">
+                <div class="stats">
+                    <h2><i class="fas fa-chart-line"></i> Business Overview</h2>
+                    <div class="stat-item">
+                        <span>Total Items in Stock</span>
+                        <span id="totalItems">38</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>Total Inventory Value</span>
+                        <span id="totalValue">KES 167,000</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>Items Sold (Month)</span>
+                        <span id="itemsSold">42</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>Revenue (Month)</span>
+                        <span id="monthRevenue">KES 183,500</span>
+                    </div>
+                </div>
+                
+                <div class="stats">
+                    <h2><i class="fas fa-exclamation-triangle"></i> Low Stock Alert</h2>
+                    <div class="stat-item">
+                        <span>Elegant Dress (L)</span>
+                        <span>3 left</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>Classic Shirt (M)</span>
+                        <span>5 left</span>
+                    </div>
+                </div>
+                
+                <div class="stats">
+                    <h2><i class="fas fa-cog"></i> Quick Actions</h2>
+                    <div class="stat-item">
+                        <button class="btn edit-btn" style="width: 100%;"><i class="fas fa-sync"></i> Refresh Data</button>
+                    </div>
+                    <div class="stat-item">
+                        <button class="btn delete-btn" style="width: 100%;"><i class="fas fa-file-export"></i> Export Report</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Password protection
+        function checkPassword() {
+            const password = document.getElementById('passwordInput').value;
+            const errorMsg = document.getElementById('errorMsg');
+            
+            if (password === '123456789') {
+                document.getElementById('authScreen').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'block';
+                loadProductData();
+            } else {
+                errorMsg.style.display = 'block';
+                setTimeout(() => {
+                    errorMsg.style.display = 'none';
+                }, 3000);
+            }
+        }
+        
+        function logout() {
+            document.getElementById('authScreen').style.display = 'block';
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('passwordInput').value = '';
+        }
+        
+        // Allow pressing Enter to submit password
+        document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkPassword();
+            }
+        });
+        
+        // Simulated product data (in a real app, this would come from your main HTML or a database)
+        const products = [
+            {
+                name: "Classic Shirt",
+                material: "Premium Cotton",
+                size: "M",
+                price: 2500,
+                stock: 15,
+                image: "https://images.unsplash.com/photo-1598033129183-c4f50c736f10?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"
+            },
+            {
+                name: "Elegant Dress",
+                material: "Pure Silk",
+                size: "L",
+                price: 4500,
+                stock: 3,
+                image: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"
+            },
+            {
+                name: "Stylish Jacket",
+                material: "Genuine Leather",
+                size: "L",
+                price: 6500,
+                stock: 8,
+                image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"
+            },
+            {
+                name: "Casual Blouse",
+                material: "Linen Blend",
+                size: "S",
+                price: 3200,
+                stock: 12,
+                image: "https://images.unsplash.com/photo-1583744946564-b52d01a7b577?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80"
+            }
+        ];
+        
+        // Load product data into the inventory list
+        function loadProductData() {
+            const inventoryList = document.getElementById('inventoryList');
+            inventoryList.innerHTML = '';
+            
+            let totalValue = 0;
+            let totalProducts = products.length;
+            
+            products.forEach((product, index) => {
+                // Add to inventory list
+                inventoryList.innerHTML += `
+                    <div class="inventory-item">
+                        <img src="${product.image}" alt="${product.name}" class="item-image">
+                        <div class="item-info">
+                            <div class="item-name">${product.name}</div>
+                            <div class="item-details">Size: ${product.size} | Material: ${product.material} | Stock: ${product.stock}</div>
+                        </div>
+                        <div class="item-actions">
+                            <button class="btn edit-btn" onclick="editItem(${index})"><i class="fas fa-edit"></i> Edit</button>
+                            <button class="btn delete-btn" onclick="deleteItem(${index})"><i class="fas fa-trash"></i> Delete</button>
+                        </div>
+                    </div>
+                `;
+                
+                // Calculate total inventory value
+                totalValue += product.price * product.stock;
+            });
+            
+            // Update business summary
+            document.getElementById('totalProducts').textContent = totalProducts;
+            document.getElementById('totalInventoryValue').textContent = `KES ${totalValue.toLocaleString()}`;
+            document.getElementById('circulatingAmount').textContent = `KES ${(totalValue * 0.75).toLocaleString()}`;
+            document.getElementById('avgProductPrice').textContent = `KES ${(totalValue / totalProducts).toLocaleString()}`;
+        }
+        
+        // Add new item function
+        function addNewItem() {
+            const name = document.getElementById('itemName').value;
+            const material = document.getElementById('itemMaterial').value;
+            const size = document.getElementById('itemSize').value;
+            const price = parseInt(document.getElementById('itemPrice').value);
+            const stock = parseInt(document.getElementById('itemStock').value);
+            const image = document.getElementById('itemImage').value;
+            
+            if (name && material && price && stock && image) {
+                products.push({
+                    name,
+                    material,
+                    size,
+                    price,
+                    stock,
+                    image
+                });
+                
+                loadProductData();
+                
+                // Reset form
+                document.getElementById('itemName').value = '';
+                document.getElementById('itemMaterial').value = '';
+                document.getElementById('itemSize').value = 'M';
+                document.getElementById('itemPrice').value = '';
+                document.getElementById('itemStock').value = '';
+                document.getElementById('itemImage').value = '';
+                
+                alert('Product added successfully!');
+            } else {
+                alert('Please fill in all fields!');
+            }
+        }
+        
+        // Edit item function
+        function editItem(index) {
+            const product = products[index];
+            const newPrice = prompt(`Enter new price for ${product.name} (current: KES ${product.price})`, product.price);
+            const newStock = prompt(`Enter new stock for ${product.name} (current: ${product.stock})`, product.stock);
+            
+            if (newPrice !== null && newStock !== null) {
+                products[index].price = parseInt(newPrice);
+                products[index].stock = parseInt(newStock);
+                loadProductData();
+                alert('Product updated successfully!');
+            }
+        }
+        
+        // Delete item function
+        function deleteItem(index) {
+            if (confirm(`Are you sure you want to delete "${products[index].name}"?`)) {
+                products.splice(index, 1);
+                loadProductData();
+                alert('Product deleted successfully!');
+            }
+        }
+        
+        // Simulate real-time data updates
+        function updateBusinessData() {
+            // These would normally come from a backend
+            const items = parseInt(document.getElementById('totalItems').innerText);
+            const sold = parseInt(document.getElementById('itemsSold').innerText);
+            
+            // Simulate small changes in data
+            document.getElementById('totalItems').innerText = items + Math.floor(Math.random() * 3);
+            document.getElementById('itemsSold').innerText = sold + Math.floor(Math.random() * 2);
+            
+            setTimeout(updateBusinessData, 10000); // Update every 10 seconds
+        }
+        
+        // Start data updates when page loads
+        window.onload = function() {
+            setTimeout(updateBusinessData, 10000);
+        };
+    </script>
+</body>
+</html>
