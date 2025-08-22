@@ -317,6 +317,26 @@ header {
   .product-image img { height: 100%; object-fit: cover; }
 }
 
+  /* ===== Footer Section ===== */
+#site-footer {
+  background: #222;       /* dark background */
+  color: #fff;            /* white text */
+  text-align: center;     /* center everything */
+  padding: 20px;
+  margin-top: 40px;
+  font-size: 14px;
+}
+
+#site-footer a {
+  color: #ffcc00;         /* highlight links */
+  text-decoration: none;
+}
+
+#site-footer a:hover {
+  text-decoration: underline;
+}
+
+
 </style>
 </head>
 <body>
@@ -700,16 +720,22 @@ header {
 <!-- Overlay -->
 <div class="overlay" id="overlay"></div>
 
-<footer>
+<footer id="site-footer">
   <div class="footer-content">
     <p>© 2025 Towett's Collection. All rights reserved.</p>
+    
     <div class="social-links">
       <a href="#"><i class="fab fa-facebook-f"></i></a>
       <a href="#"><i class="fab fa-instagram"></i></a>
       <a href="#"><i class="fab fa-twitter"></i></a>
       <a href="#"><i class="fab fa-pinterest-p"></i></a>
     </div>
-    <p>Contact us: info@Towett's Collection.com | +254 727016623</p>
+    
+    <p>
+      Contact us: 
+      <a href="mailto:info@towettscollection.com">info@towettscollection.com</a> | 
+      <a href="tel:+254727016623">+254 727 016623</a>
+    </p>
   </div>
 </footer>
 
