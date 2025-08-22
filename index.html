@@ -1,5 +1,4 @@
-
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -661,7 +660,8 @@ footer {
          data-name="Formal Trousers" 
          data-material="Polyester Blend" 
          data-size="14" 
-         data-price="1850">
+         data-price="1850"
+         data-github-url="https://rhonaldh265.github.io/classic/p141.png">
 
       <div class="product-image">
         <img id="product13-img" src="p141.png" alt="Formal Trousers">
@@ -686,7 +686,8 @@ footer {
          data-name="Leather Bag" 
          data-material="Leather" 
          data-size="17" 
-         data-price="1400">
+         data-price="1400"
+         data-github-url="https://rhonaldh265.github.io/classic/p121.png">
 
       <div class="product-image">
         <img id="product12-img" src="p121.png" alt="Leather Bag">
@@ -711,7 +712,8 @@ footer {
          data-name="Summer Dress" 
          data-material="Cotton" 
          data-size="14" 
-         data-price="1800">
+         data-price="1800"
+         data-github-url="https://rhonaldh265.github.io/classic/p101.png">
 
       <div class="product-image">
         <img id="product10-img" src="p101.png" alt="Summer Dress">
@@ -736,7 +738,8 @@ footer {
          data-name="Hoodie" 
          data-material="Cotton" 
          data-size="15" 
-         data-price="1600">
+         data-price="1600"
+         data-github-url="https://rhonaldh265.github.io/classic/p91.png">
 
       <div class="product-image">
         <img id="product9-img" src="p91.png" alt="Hoodie">
@@ -761,7 +764,8 @@ footer {
          data-name="Running Sneakers" 
          data-material="Synthetic" 
          data-size="7" 
-         data-price="2000">
+         data-price="2000"
+         data-github-url="https://rhonaldh265.github.io/classic/p81.png">
 
       <div class="product-image">
         <img id="product8-img" src="p81.png" alt="Running Sneakers">
@@ -786,7 +790,8 @@ footer {
          data-name="Classic Jeans" 
          data-material="Denim" 
          data-size="27" 
-         data-price="1600">
+         data-price="1600"
+         data-github-url="https://rhonaldh265.github.io/classic/p71.png">
 
       <div class="product-image">
         <img id="product7-img" src="p71.png" alt="Classic Jeans">
@@ -811,7 +816,8 @@ footer {
          data-name="White T-shirt" 
          data-material="Cotton" 
          data-size="28" 
-         data-price="1600">
+         data-price="1600"
+         data-github-url="https://rhonaldh265.github.io/classic/p61.png">
 
       <div class="product-image">
         <img id="product6-img" src="p61.png" alt="White T-shirt">
@@ -836,7 +842,8 @@ footer {
          data-name="White Classic Shirt" 
          data-material="Cotton" 
          data-size="27" 
-         data-price="1500">
+         data-price="1500"
+         data-github-url="https://rhonaldh265.github.io/classic/p51.png">
 
       <div class="product-image">
         <img id="product5-img" src="p51.png" alt="White Classic Shirt">
@@ -861,7 +868,8 @@ footer {
          data-name="Classic Jacket" 
          data-material="Cotton" 
          data-size="34" 
-         data-price="1600">
+         data-price="1600"
+         data-github-url="https://rhonaldh265.github.io/classic/p41.png">
 
       <div class="product-image">
         <img id="product4-img" src="p41.png" alt="Classic Jacket">
@@ -886,7 +894,8 @@ footer {
          data-name="Leather Jacket" 
          data-material="Leather" 
          data-size="18" 
-         data-price="1600">
+         data-price="1600"
+         data-github-url="https://rhonaldh265.github.io/classic/p31.png">
 
       <div class="product-image">
         <img id="product3-img" src="p31.png" alt="Leather Jacket">
@@ -911,7 +920,8 @@ footer {
          data-name="Elegant Dress" 
          data-material="Polyester" 
          data-size="17" 
-         data-price="1800">
+         data-price="1800"
+         data-github-url="https://rhonaldh265.github.io/classic/p21.png">
 
       <div class="product-image">
         <img id="product2-img" src="p21.png" alt="Elegant Dress">
@@ -936,7 +946,8 @@ footer {
          data-name="Official Shirt" 
          data-material="Cotton" 
          data-size="18" 
-         data-price="800">
+         data-price="800"
+         data-github-url="https://rhonaldh265.github.io/classic/p11.png">
 
       <div class="product-image">
         <img id="product1-img" src="p11.png" alt="Official Shirt">
@@ -1007,7 +1018,6 @@ footer {
   </div>
 </footer>
 
-
 <script>
 // Slideshow for product cards
 const productCards = document.querySelectorAll('.product-card');
@@ -1015,13 +1025,18 @@ productCards.forEach(card => {
   const imgEl = card.querySelector('img');
   const images = JSON.parse(card.getAttribute('data-images'));
   let index = 0;
-  setInterval(() => {
+  
+  // Set initial image
+  imgEl.src = images[0];
+  
+  const interval = setInterval(() => {
     index = (index + 1) % images.length;
     imgEl.src = images[index];
   }, 2000);
   
   // Click to open modal slideshow
   imgEl.addEventListener('click', () => {
+    clearInterval(interval);
     openImageModal(images);
   });
 });
@@ -1044,8 +1059,9 @@ document.querySelectorAll('.add-btn').forEach((btn, index) => {
       name: card.dataset.name,
       material: card.dataset.material,
       size: card.dataset.size,
-      price: parseInt(card.dataset.price),
+      price: parseInt(card.dataset.price.replace(/,/g, '')),
       img: JSON.parse(card.dataset.images)[0],
+      githubUrl: card.dataset.githubUrl,
       quantity: 1
     };
     
@@ -1065,7 +1081,7 @@ document.querySelectorAll('.add-btn').forEach((btn, index) => {
     }
     
     updateBasket();
-    showNotification(`${product.name}  succesfully -dded to basket`);
+    showNotification(`${product.name} successfully added to basket`);
   });
 });
 
@@ -1092,7 +1108,7 @@ function updateBasket() {
           <div class="basket-item-meta">
             <p>Material: ${item.material}</p>
             <p>Size: ${item.size}</p>
-            <p>KES ${item.price} each</p>
+            <p>KES ${item.price.toLocaleString()} each</p>
           </div>
           <div class="basket-item-controls">
             <div class="quantity-control">
@@ -1106,7 +1122,7 @@ function updateBasket() {
           </div>
         </div>
       </div>
-    `;
+ `;
   });
   
   basketTotal.textContent = total.toLocaleString();
@@ -1157,11 +1173,9 @@ function closeBasketModal() {
 
 // Admin button
 document.getElementById('adminBtn').addEventListener('click', () => {
-  window.open("admin-panel.html", "_blank");  // opens in new tab
+  alert("Admin panel would open here");
+  // window.open("admin-panel.html", "_blank");  // opens in new tab
 });
-
-
-
 
 // Image modal
 const imgModal = document.getElementById('imgModal');
@@ -1173,6 +1187,7 @@ function openImageModal(images) {
   modalImg.src = images[idx];
   imgModal.classList.add('show');
   document.body.style.overflow = 'hidden';
+  overlay.classList.add('show');
   
   const interval = setInterval(() => {
     idx = (idx + 1) % images.length;
@@ -1183,6 +1198,14 @@ function openImageModal(images) {
     clearInterval(interval);
     imgModal.classList.remove('show');
     document.body.style.overflow = 'auto';
+    overlay.classList.remove('show');
+  }
+  
+  overlay.onclick = () => {
+    clearInterval(interval);
+    imgModal.classList.remove('show');
+    document.body.style.overflow = 'auto';
+    overlay.classList.remove('show');
   }
 }
 
@@ -1195,21 +1218,21 @@ document.getElementById('inquireBtn').addEventListener('click', () => {
   
   let message = "Hello, I am interested in the following items:%0A%0A";
   basket.forEach(item => {
-    message += `• ${item.name} - Material: ${item.material}, Size: ${item.size}, Quantity: ${item.quantity}, Price: KES ${item.price * item.quantity}%0A`;
+    message += `• ${item.name} - Material: ${item.material}, Size: ${item.size}, Quantity: ${item.quantity}, Price: KES ${(item.price * item.quantity).toLocaleString()}%0A`;
+    message += `  View product: ${item.githubUrl}%0A%0A`;
   });
   
-  message += `%0ATotal: KES ${basket.reduce((sum, i) => sum + (i.price * i.quantity), 0)}%0A%0A`;
+  message += `%0ATotal: KES ${basket.reduce((sum, i) => sum + (i.price * i.quantity), 0).toLocaleString()}%0A%0A`;
   
   // Add comment if provided
   const comment = document.getElementById('comment').value;
   if (comment.trim() !== '') {
-  
-    message += `  Special Instructions: ${comment}%0A%0A`;
+    message += `Special Instructions: ${comment}%0A%0A`;
   }
   
   message += "Please let me know about availability and payment options. Thank you!";
   
-  // your WhatsApp number
+  // Replace with your WhatsApp number
   const waLink = `https://wa.me/254727016623?text=${message}`;
   window.open(waLink, "_blank");
 });
