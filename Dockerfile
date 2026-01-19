@@ -1,11 +1,18 @@
-# Use official PHP image
 FROM php:8.2-apache
 
-# Copy all project files to web root
+# Enable Apache rewrite (common need)
+RUN a2enmod rewrite
+
+# Copy project files
 COPY . /var/www/html/
 
-# Expose port 80
-EXPOSE 80
+# Configure Apache to use Render's PORT
+RUN sed -i 's/80/${PORT}/g' /etc/apache2/ports.conf \
+ && sed -i 's/:80/:${PORT}/g' /etc/apache2/sites-available/000-default.conf
 
-# Start Apache when container runs
+# Tell Apache to use the PORT env var
+ENV PORT=10000
+
+EXPOSE 10000
+
 CMD ["apache2-foreground"]
