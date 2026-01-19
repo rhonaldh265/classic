@@ -2,43 +2,50 @@
 // mpesa_callback.php - Handles M-Pesa payment callbacks
 header('Content-Type: application/json');
 
-// Log the callback for debugging
+// Log the callback data
 $logData = [
     'timestamp' => date('Y-m-d H:i:s'),
     'method' => $_SERVER['REQUEST_METHOD'],
-    'post_data' => file_get_contents('php://input'),
-    'get_data' => $_GET
+    'raw_input' => file_get_contents('php://input'),
+    'server_data' => $_SERVER
 ];
 
 // Save to log file
-file_put_contents('callback_log.txt', json_encode($logData) . "\n", FILE_APPEND);
+file_put_contents('mpesa_callback_log.txt', 
+    json_encode($logData, JSON_PRETTY_PRINT) . "\n---\n", 
+    FILE_APPEND
+);
 
-// Process the callback if it's a POST request with JSON data
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $input = file_get_contents('php://input');
+// Process JSON input if present
+$input = file_get_contents('php://input');
+if (!empty($input)) {
     $data = json_decode($input, true);
     
-    if ($data && isset($data['Body'])) {
-        $callbackData = $data['Body']['stkCallback'] ?? null;
-        
-        if ($callbackData) {
-            $checkoutID = $callbackData['CheckoutRequestID'] ?? '';
-            $resultCode = $callbackData['ResultCode'] ?? '';
-            $resultDesc = $callbackData['ResultDesc'] ?? '';
+    if ($data) {
+        // Check for STK callback
+        if (isset($data['Body']['stkCallback'])) {
+            $callback = $data['Body']['stkCallback'];
+            $checkoutID = $callback['CheckoutRequestID'] ?? 'UNKNOWN';
+            $resultCode = $callback['ResultCode'] ?? '';
+            $resultDesc = $callback['ResultDesc'] ?? '';
             
             // Log callback details
             $callbackLog = [
-                'checkoutID' => $checkoutID,
-                'resultCode' => $resultCode,
-                'resultDesc' => $resultDesc,
-                'time' => date('Y-m-d H:i:s')
+                'checkout_id' => $checkoutID,
+                'result_code' => $resultCode,
+                'result_desc' => $resultDesc,
+                'callback_data' => $callback,
+                'timestamp' => date('Y-m-d H:i:s')
             ];
             
-            file_put_contents('payments.log', json_encode($callbackLog) . "\n", FILE_APPEND);
+            file_put_contents('callback_details.log', 
+                json_encode($callbackLog, JSON_PRETTY_PRINT) . "\n---\n", 
+                FILE_APPEND
+            );
             
             // If payment was successful
-            if ($resultCode == 0 && isset($callbackData['CallbackMetadata']['Item'])) {
-                $items = $callbackData['CallbackMetadata']['Item'];
+            if ($resultCode == 0 && isset($callback['CallbackMetadata']['Item'])) {
+                $items = $callback['CallbackMetadata']['Item'];
                 $paymentDetails = [];
                 
                 foreach ($items as $item) {
@@ -47,15 +54,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 // Save successful payment
                 $successLog = [
-                    'status' => 'success',
-                    'checkoutID' => $checkoutID,
+                    'status' => 'SUCCESS',
+                    'checkout_id' => $checkoutID,
                     'amount' => $paymentDetails['Amount'] ?? '',
-                    'receipt' => $paymentDetails['MpesaReceiptNumber'] ?? '',
+                    'mpesa_receipt' => $paymentDetails['MpesaReceiptNumber'] ?? '',
                     'phone' => $paymentDetails['PhoneNumber'] ?? '',
-                    'time' => date('Y-m-d H:i:s')
+                    'transaction_date' => $paymentDetails['TransactionDate'] ?? '',
+                    'timestamp' => date('Y-m-d H:i:s')
                 ];
                 
-                file_put_contents('successful_payments.log', json_encode($successLog) . "\n", FILE_APPEND);
+                file_put_contents('successful_payments.log', 
+                    json_encode($successLog, JSON_PRETTY_PRINT) . "\n", 
+                    FILE_APPEND
+                );
             }
         }
     }
@@ -64,6 +75,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Always return success to M-Pesa
 echo json_encode([
     'ResultCode' => 0,
-    'ResultDesc' => 'Callback received successfully'
+    'ResultDesc' => 'Callback received and processed successfully'
 ]);
 ?>
