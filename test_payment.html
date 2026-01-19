@@ -1,111 +1,370 @@
+
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Test M-Pesa Payment</title>
+    <title>Test M-Pesa Payment - Towett's Collection</title>
     <style>
-        body { font-family: Arial, sans-serif; padding: 20px; }
-        .container { max-width: 400px; margin: 0 auto; }
-        input, button { width: 100%; padding: 10px; margin: 10px 0; }
-        button { background: #28a745; color: white; border: none; cursor: pointer; }
-        button:hover { background: #218838; }
-        .result { margin-top: 20px; padding: 10px; background: #f8f9fa; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #4CAF50;
+        }
+        
+        .test-info {
+            background: #e8f5e9;
+            border: 1px solid #4CAF50;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .test-info h3 {
+            color: #2e7d32;
+            margin-bottom: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        small {
+            color: #666;
+            font-size: 12px;
+            display: block;
+            margin-top: 5px;
+        }
+        
+        button {
+            width: 100%;
+            padding: 15px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #45a049;
+        }
+        
+        button:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+        }
+        
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+        }
+        
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        
+        .loading {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+        }
+        
+        .status-log {
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 10px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        
+        .log-entry {
+            margin-bottom: 5px;
+            padding: 5px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .log-success {
+            color: #28a745;
+        }
+        
+        .log-error {
+            color: #dc3545;
+        }
+        
+        .log-info {
+            color: #17a2b8;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Test M-Pesa Payment</h2>
-        <p>Use this page to test if payment.php is working</p>
+        <h2>Test M-Pesa Payment System</h2>
         
-        <div>
-            <label>Amount (KES):</label>
-            <input type="number" id="amount" value="10" min="10">
+        <div class="test-info">
+            <h3>📋 Testing Instructions:</h3>
+            <p><strong>Test Phone:</strong> 254708374149</p>
+            <p><strong>Correct PIN:</strong> 123456 (for success)</p>
+            <p><strong>Wrong PIN:</strong> Any other number (for failure)</p>
+            <p><strong>Large Amount:</strong> > 50000 KES (for insufficient balance)</p>
         </div>
         
-        <div>
-            <label>Phone (2547XXXXXXXX):</label>
+        <div class="form-group">
+            <label for="amount">Amount (KES):</label>
+            <input type="number" id="amount" value="100" min="10">
+            <small>Minimum: 10 KES</small>
+        </div>
+        
+        <div class="form-group">
+            <label for="phone">Phone Number:</label>
             <input type="text" id="phone" value="254708374149">
-            <small>Test number: 254708374149 (use PIN: 123456)</small>
+            <small>Format: 2547XXXXXXXX or 07XXXXXXXX</small>
         </div>
         
-        <div>
-            <label>Customer Name:</label>
+        <div class="form-group">
+            <label for="name">Customer Name:</label>
             <input type="text" id="name" value="Test Customer">
         </div>
         
-        <button onclick="testPayment()">Test Payment</button>
+        <div class="form-group">
+            <label for="pin">Test PIN:</label>
+            <input type="text" id="pin" value="123456">
+            <small>Enter 123456 for success, any other for failure</small>
+        </div>
+        
+        <button id="testBtn" onclick="testPayment()">Test Payment</button>
         
         <div id="result" class="result"></div>
+        
+        <div class="status-log" id="statusLog">
+            <div class="log-entry log-info">Ready to test payment...</div>
+        </div>
     </div>
     
     <script>
+    let statusLog = document.getElementById('statusLog');
+    
+    function addLog(message, type = 'info') {
+        const logEntry = document.createElement('div');
+        logEntry.className = `log-entry log-${type}`;
+        logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+        statusLog.appendChild(logEntry);
+        statusLog.scrollTop = statusLog.scrollHeight;
+    }
+    
     function testPayment() {
         const amount = document.getElementById('amount').value;
         const phone = document.getElementById('phone').value;
         const name = document.getElementById('name').value;
+        const pin = document.getElementById('pin').value;
+        const resultDiv = document.getElementById('result');
+        const testBtn = document.getElementById('testBtn');
         
-        document.getElementById('result').innerHTML = 'Sending payment request...';
+        // Reset result display
+        resultDiv.style.display = 'none';
+        resultDiv.className = 'result';
         
+        // Validation
+        if (!amount || amount < 10) {
+            showResult('Please enter amount (minimum 10 KES)', 'error');
+            return;
+        }
+        
+        if (!phone) {
+            showResult('Please enter phone number', 'error');
+            return;
+        }
+        
+        if (!name) {
+            showResult('Please enter name', 'error');
+            return;
+        }
+        
+        if (!pin) {
+            showResult('Please enter test PIN', 'error');
+            return;
+        }
+        
+        // Update button state
+        testBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+        testBtn.disabled = true;
+        
+        addLog('Starting payment test...', 'info');
+        addLog(`Amount: KES ${amount}, Phone: ${phone}, PIN: ${pin}`, 'info');
+        
+        // Send payment request
         fetch('payment.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
-            body: `amount=${amount}&phone=${phone}&name=${name}`
+            body: `amount=${amount}&phone=${phone}&name=${encodeURIComponent(name)}&pin=${pin}`
         })
         .then(response => response.json())
         .then(data => {
-            console.log('Response:', data);
+            console.log('Payment response:', data);
             
-            if (data.ResponseCode === "0") {
-                document.getElementById('result').innerHTML = 
-                    '✅ STK Push sent! Check phone for prompt.<br>' +
-                    'Checkout ID: ' + data.CheckoutRequestID;
+            if (data.ResponseCode === "0" || data.ResponseCode === 0) {
+                showResult('✅ STK Push sent! Check phone for prompt.', 'success');
+                addLog('STK Push initiated successfully', 'success');
+                addLog(`Checkout ID: ${data.CheckoutRequestID}`, 'info');
+                addLog(`Message: ${data.TestNote || data.CustomerMessage}`, 'info');
                 
                 // Start polling for status
                 const checkoutID = data.CheckoutRequestID;
                 pollPaymentStatus(checkoutID);
                 
             } else {
-                document.getElementById('result').innerHTML = 
-                    '❌ Error: ' + data.ResponseDescription;
+                showResult('❌ ' + (data.ResponseDescription || 'Payment failed'), 'error');
+                addLog('Payment initiation failed: ' + data.ResponseDescription, 'error');
+                testBtn.innerHTML = 'Test Payment';
+                testBtn.disabled = false;
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            document.getElementById('result').innerHTML = 'Network error. Check console.';
+            showResult('❌ Network error. Check console.', 'error');
+            addLog('Network error: ' + error.message, 'error');
+            testBtn.innerHTML = 'Test Payment';
+            testBtn.disabled = false;
         });
     }
     
     function pollPaymentStatus(checkoutID) {
         let pollCount = 0;
+        const maxPolls = 20;
+        const testBtn = document.getElementById('testBtn');
         
         const interval = setInterval(() => {
             pollCount++;
             
-            if (pollCount > 20) {
+            if (pollCount > maxPolls) {
                 clearInterval(interval);
-                document.getElementById('result').innerHTML += 
-                    '<br>⏰ Timeout checking payment status';
+                addLog('❌ Payment confirmation timeout', 'error');
+                testBtn.innerHTML = 'Test Payment';
+                testBtn.disabled = false;
                 return;
             }
             
-            fetch(`payment.php?checkoutID=${checkoutID}`)
-            .then(res => res.json())
-            .then(status => {
-                console.log('Status:', status);
+            addLog(`Polling attempt ${pollCount}...`, 'info');
+            
+            fetch(`payment.php?checkoutID=${encodeURIComponent(checkoutID)}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log('Status response:', data);
                 
-                if (status.ResultCode === "0") {
+                // Payment successful
+                if (data.ResultCode === "0" || data.ResultCode === 0) {
                     clearInterval(interval);
-                    document.getElementById('result').innerHTML += 
-                        '<br>✅ Payment confirmed!';
-                } else if (status.ResultCode) {
+                    addLog('✅ PAYMENT SUCCESSFUL!', 'success');
+                    addLog(`Receipt: ${data.MpesaReceiptNumber}`, 'success');
+                    addLog(`Amount: KES ${data.Amount}`, 'success');
+                    showResult(`🎉 Payment Successful!<br>Receipt: ${data.MpesaReceiptNumber}<br>Amount: KES ${data.Amount}`, 'success');
+                    testBtn.innerHTML = 'Test Payment';
+                    testBtn.disabled = false;
+                    
+                } 
+                // Payment failed
+                else if (data.ResultCode) {
                     clearInterval(interval);
-                    document.getElementById('result').innerHTML += 
-                        '<br>❌ Payment failed: ' + status.ResultDesc;
+                    let errorMsg = 'Payment failed';
+                    switch(data.ResultCode.toString()) {
+                        case '1':
+                        case '1032':
+                            errorMsg = 'Invalid PIN';
+                            break;
+                        case '2001':
+                            errorMsg = 'Insufficient balance';
+                            break;
+                        case '1037':
+                            errorMsg = 'Transaction cancelled';
+                            break;
+                        default:
+                            errorMsg = data.ResultDesc || 'Payment failed';
+                    }
+                    
+                    addLog(`❌ ${errorMsg}`, 'error');
+                    showResult(`❌ ${errorMsg}`, 'error');
+                    testBtn.innerHTML = 'Test Payment';
+                    testBtn.disabled = false;
                 }
+                // Still processing
+                else {
+                    addLog('⏳ Waiting for payment confirmation...', 'info');
+                }
+            })
+            .catch(error => {
+                console.error('Polling error:', error);
+                addLog('Polling error: ' + error.message, 'error');
             });
         }, 3000);
     }
+    
+    function showResult(message, type) {
+        const resultDiv = document.getElementById('result');
+        resultDiv.innerHTML = message;
+        resultDiv.className = `result ${type}`;
+        resultDiv.style.display = 'block';
+    }
+    
+    // Add Font Awesome for spinner
+    const faLink = document.createElement('link');
+    faLink.rel = 'stylesheet';
+    faLink.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';
+    document.head.appendChild(faLink);
     </script>
 </body>
 </html>
