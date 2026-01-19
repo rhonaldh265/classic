@@ -1041,126 +1041,164 @@ productCards.forEach(card => {
   });
 });
 
-// Basket functionality
-let basket = [];
-const basketIcon = document.getElementById('basketIcon');
-const basketCount = document.getElementById('basketCount');
+// Add to your existing JavaScript
 const basketModal = document.getElementById('basketModal');
-const basketItems = document.getElementById('basketItems');
-const basketTotal = document.getElementById('basketTotal');
-const overlay = document.getElementById('overlay');
-const closeBasket = document.querySelector('.close-basket');
+const basketItemsContainer = document.getElementById('basketItems');
+const basketTotalElement = document.getElementById('basketTotal');
+const closeBasketBtn = document.querySelector('.close-basket');
+const inquireBtn = document.getElementById('inquireBtn');
+const commentTextarea = document.getElementById('comment');
 
-// Add to basket buttons
-document.querySelectorAll('.add-btn').forEach((btn, index) => {
-  btn.addEventListener('click', () => {
-    const card = productCards[index];
-    const product = {
-      name: card.dataset.name,
-      material: card.dataset.material,
-      size: card.dataset.size,
-      price: parseInt(card.dataset.price.replace(/,/g, '')),
-      img: JSON.parse(card.dataset.images)[0],
-      githubUrl: card.dataset.githubUrl,
-      quantity: 1
-    };
+let basket = [];
+let selectedPackage = null;
+
+// Basket functionality
+function openBasket() {
+    updateBasketDisplay();
+    basketModal.style.display = 'block';
+}
+
+function closeBasket() {
+    basketModal.style.display = 'none';
+}
+
+function addToBasket(packageIndex) {
+    selectedPackage = packages[packageIndex];
     
-    // Check if product already exists in basket
-    const existingProductIndex = basket.findIndex(item => 
-      item.name === product.name && 
-      item.material === product.material && 
-      item.size === product.size
-    );
+    // Check if item already in basket
+    const existingItemIndex = basket.findIndex(item => item.name === selectedPackage.name);
     
-    if (existingProductIndex !== -1) {
-      // Increase quantity if product already in basket
-      basket[existingProductIndex].quantity += 1;
+    if (existingItemIndex > -1) {
+        // Update quantity if already exists
+        basket[existingItemIndex].quantity += 1;
     } else {
-      // Add new product to basket
-      basket.push(product);
+        // Add new item to basket
+        basket.push({
+            ...selectedPackage,
+            quantity: 1
+        });
     }
     
-    updateBasket();
-    showNotification(`${product.name} successfully added to basket`);
-  });
-});
+    updateBasketDisplay();
+    openBasket();
+}
 
-function updateBasket() {
-  basketCount.textContent = basket.reduce((total, item) => total + item.quantity, 0);
-  basketItems.innerHTML = '';
-  let total = 0;
-  
-  if (basket.length === 0) {
-    basketItems.innerHTML = '<p style="text-align: center; padding: 20px; color: #6c757d;">Your basket is empty</p>';
-    basketTotal.textContent = '0';
-    return;
-  }
-  
-  basket.forEach((item, i) => {
-    const itemTotal = item.price * item.quantity;
-    total += itemTotal;
+function updateBasketDisplay() {
+    basketItemsContainer.innerHTML = '';
+    let total = 0;
     
-    basketItems.innerHTML += `
-      <div class="basket-item">
-        <img src="${item.img}" alt="${item.name}">
-        <div class="basket-item-info">
-          <h4>${item.name}</h4>
-          <div class="basket-item-meta">
-            <p>Material: ${item.material}</p>
-            <p>Size: ${item.size}</p>
-            <p>KES ${item.price.toLocaleString()} each</p>
-          </div>
-          <div class="basket-item-controls">
-            <div class="quantity-control">
-              <button class="quantity-btn" onclick="changeQuantity(${i}, -1)">-</button>
-              <input type="number" class="quantity-input" value="${item.quantity}" min="1" onchange="updateQuantity(${i}, this.value)">
-              <button class="quantity-btn" onclick="changeQuantity(${i}, 1)">+</button>
+    if (basket.length === 0) {
+        basketItemsContainer.innerHTML = '<p class="empty-basket">Your basket is empty</p>';
+        basketTotalElement.textContent = '0';
+        inquireBtn.disabled = true;
+        inquireBtn.style.opacity = '0.6';
+        return;
+    }
+    
+    basket.forEach((item, index) => {
+        const itemTotal = item.price * item.quantity;
+        total += itemTotal;
+        
+        const itemElement = document.createElement('div');
+        itemElement.className = 'basket-item';
+        itemElement.innerHTML = `
+            <div class="item-info">
+                <h4>${item.name}</h4>
+                <p>KES ${item.price} x ${item.quantity}</p>
             </div>
-            <button class="remove-btn" onclick="removeFromBasket(${i})">
-              <i class="fas fa-trash"></i>
-            </button>
-          </div>
-        </div>
-      </div>
- `;
-  });
-  
-  basketTotal.textContent = total.toLocaleString();
+            <div class="item-controls">
+                <span class="item-total">KES ${itemTotal}</span>
+                <div class="quantity-controls">
+                    <button onclick="updateQuantity(${index}, -1)">-</button>
+                    <span>${item.quantity}</span>
+                    <button onclick="updateQuantity(${index}, 1)">+</button>
+                </div>
+                <button class="remove-item" onclick="removeFromBasket(${index})">×</button>
+            </div>
+        `;
+        basketItemsContainer.appendChild(itemElement);
+    });
+    
+    basketTotalElement.textContent = total;
+    inquireBtn.disabled = false;
+    inquireBtn.style.opacity = '1';
 }
 
-function changeQuantity(index, change) {
-  basket[index].quantity += change;
-  
-  if (basket[index].quantity < 1) {
-    basket[index].quantity = 1;
-  }
-  
-  updateBasket();
-}
-
-function updateQuantity(index, value) {
-  const quantity = parseInt(value);
-  
-  if (isNaN(quantity) || quantity < 1) {
-    basket[index].quantity = 1;
-  } else {
-    basket[index].quantity = quantity;
-  }
-  
-  updateBasket();
+function updateQuantity(index, change) {
+    basket[index].quantity += change;
+    
+    if (basket[index].quantity < 1) {
+        removeFromBasket(index);
+    } else {
+        updateBasketDisplay();
+    }
 }
 
 function removeFromBasket(index) {
-  basket.splice(index, 1);
-  updateBasket();
+    basket.splice(index, 1);
+    updateBasketDisplay();
 }
 
-// Toggle basket modal
-basketIcon.addEventListener('click', () => {
-  basketModal.classList.add('show');
-  overlay.classList.add('show');
-  document.body.style.overflow = 'hidden';
+function clearBasket() {
+    basket = [];
+    updateBasketDisplay();
+}
+
+// Modify your existing package table generation to use basket
+packages.forEach((pkg, index) => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+        <td>${pkg.name}</td>
+        <td>${pkg.price}</td>
+        <td>${pkg.duration}</td>
+        <td>${pkg.bonus}</td>
+        <td>
+            <button onclick="addToBasket(${index})">Add to Basket</button>
+        </td>`;
+    table.appendChild(row);
 });
+
+// WhatsApp inquiry function
+inquireBtn.addEventListener('click', function() {
+    if (basket.length === 0) {
+        alert('Your basket is empty!');
+        return;
+    }
+    
+    const phoneNumber = "254727016623"; // Your WhatsApp number
+    let message = "Hello! I'd like to inquire about the following WiFi packages:\n\n";
+    
+    basket.forEach(item => {
+        message += `- ${item.name} Package: KES ${item.price} × ${item.quantity} = KES ${item.price * item.quantity}\n`;
+        message += `  Duration: ${item.duration}, Bonus: ${item.bonus}\n\n`;
+    });
+    
+    message += `Total: KES ${basketTotalElement.textContent}\n`;
+    
+    const comment = commentTextarea.value.trim();
+    if (comment) {
+        message += `\nSpecial Instructions: ${comment}`;
+    }
+    
+    message += "\n\nPlease let me know the next steps!";
+    
+    // Encode the message for URL
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappURL = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+    
+    // Open WhatsApp in a new tab
+    window.open(whatsappURL, '_blank');
+});
+
+// Close basket when clicking outside
+window.addEventListener('click', function(event) {
+    if (event.target === basketModal) {
+        closeBasket();
+    }
+});
+
+// Close basket with button
+closeBasketBtn.addEventListener('click', closeBasket);
 
 closeBasket.addEventListener('click', closeBasketModal);
 overlay.addEventListener('click', closeBasketModal);
